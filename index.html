@@ -4,158 +4,654 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fajrly - Wake Up for Fajr</title>
+    <meta name="description" content="Fajrly is a Fajr alarm that won't turn off until you finish a challenge, like solving a math problem or shaking your phone, so you're awake enough to pray.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --night: #0b1026;
+            --twilight: #1b2658;
+            --horizon: #f6b25f;
+            --glow: #ffd9a0;
+            --paper: #eef2fb;
+            --ink: #0b1026;
+            --text-on-dark: #f4efe6;
+            --muted-on-dark: #aab3d6;
+            --muted-on-light: #4a5278;
+            --display: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+            --body: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 50px 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
-            font-size: 48px;
-            color: #667eea;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        
-        .tagline {
-            font-size: 20px;
-            color: #666;
-            margin-bottom: 30px;
-        }
-        
-        .description {
-            font-size: 16px;
-            color: #444;
+            font-family: var(--body);
+            background: var(--night);
+            color: var(--text-on-dark);
             line-height: 1.6;
-            margin-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
         }
-        
-        .download-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 18px 50px;
-            border-radius: 50px;
+
+        a { color: inherit; }
+
+        :focus-visible {
+            outline: 3px solid var(--glow);
+            outline-offset: 3px;
+        }
+
+        /* ---------- Hero: pre-dawn sky ---------- */
+        .sky {
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(120% 70% at 50% 108%, var(--horizon) 0%, rgba(246, 178, 95, 0.55) 22%, rgba(246, 178, 95, 0) 60%),
+                linear-gradient(180deg, var(--night) 0%, #141c47 55%, var(--twilight) 100%);
+        }
+
+        .sky::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(1.5px 1.5px at 8% 14%, #fff 50%, transparent 52%),
+                radial-gradient(1px 1px at 17% 38%, #fff 50%, transparent 52%),
+                radial-gradient(1.5px 1.5px at 29% 9%, #fff 50%, transparent 52%),
+                radial-gradient(1px 1px at 41% 27%, #fff 50%, transparent 52%),
+                radial-gradient(1.5px 1.5px at 56% 12%, #fff 50%, transparent 52%),
+                radial-gradient(1px 1px at 66% 33%, #fff 50%, transparent 52%),
+                radial-gradient(1.5px 1.5px at 78% 8%, #fff 50%, transparent 52%),
+                radial-gradient(1px 1px at 88% 24%, #fff 50%, transparent 52%),
+                radial-gradient(1px 1px at 94% 46%, #fff 50%, transparent 52%),
+                radial-gradient(1px 1px at 4% 52%, #fff 50%, transparent 52%),
+                radial-gradient(1px 1px at 47% 48%, #fff 50%, transparent 52%);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .wrap {
+            position: relative;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        header.site {
+            position: relative;
+            padding: 28px 0 0;
+        }
+
+        .wordmark {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: -0.02em;
             text-decoration: none;
+        }
+
+        .hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 56px;
+            align-items: center;
+            padding: 72px 0 120px;
+        }
+
+        h1 {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: clamp(40px, 6vw, 68px);
+            line-height: 1.02;
+            letter-spacing: -0.035em;
+            max-width: 12ch;
+        }
+
+        .lede {
+            margin-top: 24px;
+            font-size: 19px;
+            color: var(--muted-on-dark);
+            max-width: 44ch;
+        }
+
+        .cta-row {
+            margin-top: 36px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--glow);
+            color: var(--ink);
+            font-family: var(--display);
+            font-weight: 700;
             font-size: 18px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            padding: 16px 32px;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: transform 0.15s ease, background 0.15s ease;
         }
-        
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        }
-        
+
+        .btn:hover { background: #fff; transform: translateY(-2px); }
+
+        .cta-note { font-size: 15px; color: var(--muted-on-dark); }
+
         .notice {
             display: none;
-            margin-top: 20px;
-            color: #764ba2;
+            margin-top: 16px;
+            font-size: 15px;
+            color: var(--glow);
+        }
+
+        /* ---------- Demo alarm ---------- */
+        .alarm {
+            background: rgba(11, 16, 38, 0.72);
+            border: 1px solid rgba(244, 239, 230, 0.16);
+            border-radius: 32px;
+            padding: 32px 28px 28px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+            max-width: 380px;
+            width: 100%;
+            justify-self: center;
+        }
+
+        .alarm-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--muted-on-dark);
+            font-size: 15px;
+        }
+
+        .bell {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--horizon);
+            box-shadow: 0 0 0 0 rgba(246, 178, 95, 0.6);
+            animation: ring 1.4s ease-out infinite;
+        }
+
+        @keyframes ring {
+            0% { box-shadow: 0 0 0 0 rgba(246, 178, 95, 0.6); }
+            100% { box-shadow: 0 0 0 16px rgba(246, 178, 95, 0); }
+        }
+
+        .alarm.done .bell { animation: none; background: #8fe0b0; }
+
+        .alarm-time {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: 84px;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin: 20px 0 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .alarm-label { color: var(--muted-on-dark); font-size: 16px; }
+
+        .problem {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(244, 239, 230, 0.14);
+        }
+
+        .problem-q {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 40px;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .problem form {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .problem input {
+            flex: 1;
+            min-width: 0;
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 22px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid rgba(244, 239, 230, 0.22);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-on-dark);
+        }
+
+        .problem input::placeholder { color: rgba(170, 179, 214, 0.6); }
+
+        .problem button {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 17px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 0;
+            background: var(--horizon);
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .problem button:hover { background: var(--glow); }
+
+        .status {
+            margin-top: 12px;
+            min-height: 24px;
+            font-size: 15px;
+            color: var(--muted-on-dark);
+        }
+
+        .status.bad { color: #ffb3a7; }
+        .status.good { color: #8fe0b0; }
+
+        .alarm.shake .problem input { animation: shake 0.3s; }
+
+        @keyframes shake {
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .again {
+            display: none;
+            margin-top: 8px;
+            background: none;
+            border: 0;
+            color: var(--glow);
+            font: inherit;
+            font-size: 15px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .alarm.done .again { display: inline-block; }
+        .alarm.done .panel,
+        .alarm.done .tabs { display: none; }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .tab {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 15px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(244, 239, 230, 0.22);
+            background: transparent;
+            color: var(--muted-on-dark);
+            cursor: pointer;
+        }
+
+        .tab[aria-selected="true"] {
+            background: var(--text-on-dark);
+            color: var(--ink);
+            border-color: transparent;
+        }
+
+        .tab.soon {
+            border-style: dashed;
+            cursor: default;
+            opacity: 0.75;
+        }
+
+        .meter {
+            height: 12px;
+            margin-top: 18px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .meter span {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: var(--horizon);
+            transition: width 0.15s ease;
+        }
+
+        .shake-btn {
+            margin-top: 16px;
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 17px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 0;
+            background: var(--horizon);
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .shake-btn:hover { background: var(--glow); }
+
+        /* ---------- Content ---------- */
+        .light {
+            background: var(--paper);
+            color: var(--ink);
+            padding: 96px 0;
+        }
+
+        h2 {
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: clamp(30px, 4vw, 44px);
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            max-width: 18ch;
+        }
+
+        .steps {
+            margin-top: 48px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            list-style: none;
+            counter-reset: step;
+        }
+
+        .steps li { counter-increment: step; }
+
+        .steps li::before {
+            content: counter(step);
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--ink);
+            color: var(--glow);
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .steps h3 {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: -0.015em;
+            margin-bottom: 6px;
+        }
+
+        .steps p { color: var(--muted-on-light); max-width: 32ch; }
+
+        .why {
+            margin-top: 80px;
+            padding-top: 56px;
+            border-top: 2px solid var(--ink);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .why p { font-size: 20px; max-width: 36ch; }
+
+        .why p + p { color: var(--muted-on-light); }
+
+        .closing {
+            background: linear-gradient(180deg, var(--night) 0%, #141c47 100%);
+            padding: 96px 0;
+        }
+
+        .closing .wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        footer {
+            background: var(--night);
+            color: var(--muted-on-dark);
             font-size: 14px;
-            line-height: 1.5;
+            padding: 24px 0 32px;
         }
-        
-        .features {
-            margin-top: 40px;
-            text-align: left;
+
+        @media (max-width: 860px) {
+            .hero { grid-template-columns: 1fr; gap: 48px; padding: 48px 0 96px; }
+            .steps, .why { grid-template-columns: 1fr; gap: 32px; }
+            .light, .closing { padding: 72px 0; }
         }
-        
-        .feature {
-            margin-bottom: 15px;
-            padding-left: 30px;
-            position: relative;
-            color: #555;
+
+        @media (max-width: 420px) {
+            .alarm-time { font-size: 68px; }
+            .problem-q { font-size: 34px; }
         }
-        
-        .feature:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-            font-size: 20px;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 40px 30px;
-            }
-            
-            h1 {
-                font-size: 36px;
-            }
-            
-            .tagline {
-                font-size: 18px;
-            }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .bell, .alarm.shake .problem input { animation: none; }
+            .btn { transition: none; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Fajrly</h1>
-        <p class="tagline">Never Miss Fajr Again</p>
-        <p class="description">
-            Wake up for Fajr prayer with purpose. Our alarm requires you to solve math problems to turn it off - no more hitting snooze half-asleep.
-        </p>
-        
-        <a href="https://apps.apple.com/us/app/fajrly-fajr-alarm/id6751566416" id="downloadBtn" class="download-btn">Download Now</a>
-        <p class="notice" id="notice"></p>
-        
-        <div class="features">
-            <div class="feature">Math problems prevent snoozing</div>
-            <div class="feature">Build consistent Fajr habits</div>
-            <div class="feature">Join thousands waking up daily</div>
-            <div class="feature">Strengthen your discipline</div>
+    <div class="sky">
+        <div class="wrap">
+            <header class="site">
+                <a class="wordmark" href="#">Fajrly</a>
+            </header>
+
+            <main class="hero">
+                <div>
+                    <h1>Wake up for Fajr. Stay up for it.</h1>
+                    <p class="lede">Fajrly is an alarm that won't turn off until you finish a challenge. Solve a math problem, shake your phone, with more challenges on the way, so you're awake enough to pray.</p>
+                    <div class="cta-row">
+                        <a href="https://apps.apple.com/us/app/fajrly-fajr-alarm/id6751566416" class="btn download-link">Download on the App Store</a>
+                        <span class="cta-note">For iPhone</span>
+                    </div>
+                    <p class="notice" id="notice" role="status"></p>
+                </div>
+
+                <section class="alarm" id="alarm" aria-label="Fajrly alarm demo">
+                    <div class="alarm-top">
+                        <span>Fajr alarm</span>
+                        <span class="bell" aria-hidden="true"></span>
+                    </div>
+                    <div class="alarm-time">4:52</div>
+                    <div class="alarm-label" id="alarmLabel">Ringing. Finish the challenge to stop the alarm.</div>
+
+                    <div class="tabs" role="tablist" aria-label="Wake-up challenges">
+                        <button type="button" role="tab" class="tab" data-mode="math" aria-selected="true">Math</button>
+                        <button type="button" role="tab" class="tab" data-mode="shake" aria-selected="false">Shake</button>
+                        <span class="tab soon">More soon</span>
+                    </div>
+
+                    <div class="problem">
+                        <div class="panel" id="mathPanel">
+                        <div class="problem-q" id="question" aria-live="polite">14 × 6</div>
+                        <form id="answerForm" autocomplete="off">
+                            <label for="answer" class="sr-only" style="position:absolute;left:-9999px;">Your answer</label>
+                            <input id="answer" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Answer" required>
+                            <button type="submit">Stop alarm</button>
+                        </form>
+                        </div>
+
+                        <div class="panel" id="shakePanel" hidden>
+                            <div class="problem-q">Shake your phone</div>
+                            <div class="meter" role="progressbar" aria-label="Shake progress" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="meter"><span id="meterFill"></span></div>
+                            <button type="button" class="shake-btn" id="shakeBtn">Tap to simulate a shake</button>
+                        </div>
+
+                        <p class="status" id="status" role="status"></p>
+                        <button type="button" class="again" id="again">Try another</button>
+                    </div>
+                </section>
+            </main>
         </div>
     </div>
 
+    <section class="light">
+        <div class="wrap">
+            <h2>No snooze button to hit half-asleep.</h2>
+            <ol class="steps">
+                <li>
+                    <h3>Set your Fajr alarm</h3>
+                    <p>Pick the time you want to wake up for prayer.</p>
+                </li>
+                <li>
+                    <h3>Finish the challenge</h3>
+                    <p>The alarm keeps ringing until you solve a math problem or shake your phone. More challenges are coming.</p>
+                </li>
+                <li>
+                    <h3>Get up and pray</h3>
+                    <p>By the time the alarm stops, you're already awake.</p>
+                </li>
+            </ol>
+
+            <div class="why">
+                <p>Missing Fajr is rarely about intention. It's the moment of silencing the alarm and falling back asleep.</p>
+                <p>Fajrly puts a small task in that moment, so waking up becomes a habit you build one morning at a time.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="closing">
+        <div class="wrap">
+            <h2>Make tomorrow's Fajr the one you wake up for.</h2>
+            <a href="https://apps.apple.com/us/app/fajrly-fajr-alarm/id6751566416" class="btn download-link">Download on the App Store</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="wrap">Fajrly</div>
+    </footer>
+
     <script>
-        const APP_STORE_URL = 'https://apps.apple.com/us/app/fajrly-fajr-alarm/id6751566416';
-        
-        function isAndroid() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            return /android/i.test(userAgent);
+        const alarm = document.getElementById('alarm');
+        const questionEl = document.getElementById('question');
+        const answerEl = document.getElementById('answer');
+        const statusEl = document.getElementById('status');
+        const labelEl = document.getElementById('alarmLabel');
+        const form = document.getElementById('answerForm');
+        const againBtn = document.getElementById('again');
+        let current = 14 * 6;
+
+        function newProblem() {
+            const a = 11 + Math.floor(Math.random() * 9);
+            const b = 3 + Math.floor(Math.random() * 7);
+            current = a * b;
+            questionEl.textContent = a + ' × ' + b;
+            answerEl.value = '';
+            statusEl.textContent = '';
+            statusEl.className = 'status';
+            labelEl.textContent = 'Ringing. Finish the challenge to stop the alarm.';
+            alarm.classList.remove('done');
         }
-        
-        document.getElementById('downloadBtn').addEventListener('click', function(e) {
+
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
-            const notice = document.getElementById('notice');
-            
-            // Fajrly is iOS-only for now, so don't send Android users to a dead link
-            if (isAndroid()) {
-                notice.textContent = 'Fajrly is currently available on iPhone only. Android is coming soon!';
-                notice.style.display = 'block';
-                return;
+            if (parseInt(answerEl.value, 10) === current) {
+                alarm.classList.add('done');
+                labelEl.textContent = 'Alarm off. Time to pray.';
+                statusEl.textContent = 'Correct.';
+                statusEl.className = 'status good';
+            } else {
+                statusEl.textContent = 'Not quite. Try again.';
+                statusEl.className = 'status bad';
+                alarm.classList.remove('shake');
+                void alarm.offsetWidth;
+                alarm.classList.add('shake');
+                answerEl.select();
             }
-            
-            notice.textContent = 'Redirecting to the App Store...';
-            notice.style.display = 'block';
-            setTimeout(() => {
-                window.location.href = APP_STORE_URL;
-            }, 500);
+        });
+
+        // Challenge tabs: math and shake (more challenges coming)
+        const SHAKES_NEEDED = 10;
+        let shakes = 0;
+        let mode = 'math';
+        const mathPanel = document.getElementById('mathPanel');
+        const shakePanel = document.getElementById('shakePanel');
+        const meter = document.getElementById('meter');
+        const meterFill = document.getElementById('meterFill');
+        const shakeBtn = document.getElementById('shakeBtn');
+        const tabs = document.querySelectorAll('.tab[data-mode]');
+
+        function resetShake() {
+            shakes = 0;
+            meterFill.style.width = '0%';
+            meter.setAttribute('aria-valuenow', '0');
+            statusEl.textContent = '';
+            statusEl.className = 'status';
+            labelEl.textContent = 'Ringing. Finish the challenge to stop the alarm.';
+            alarm.classList.remove('done');
+        }
+
+        function setMode(m) {
+            mode = m;
+            tabs.forEach(function (t) {
+                t.setAttribute('aria-selected', t.dataset.mode === m ? 'true' : 'false');
+            });
+            mathPanel.hidden = m !== 'math';
+            shakePanel.hidden = m !== 'shake';
+            if (m === 'math') { newProblem(); } else { resetShake(); }
+        }
+
+        function registerShake() {
+            if (mode !== 'shake' || alarm.classList.contains('done')) return;
+            shakes++;
+            meterFill.style.width = Math.min(100, (shakes / SHAKES_NEEDED) * 100) + '%';
+            meter.setAttribute('aria-valuenow', String(Math.min(shakes, SHAKES_NEEDED)));
+            if (shakes >= SHAKES_NEEDED) {
+                alarm.classList.add('done');
+                labelEl.textContent = 'Alarm off. Time to pray.';
+                statusEl.textContent = 'Nice shaking.';
+                statusEl.className = 'status good';
+            }
+        }
+
+        tabs.forEach(function (t) {
+            t.addEventListener('click', function () { setMode(t.dataset.mode); });
+        });
+        shakeBtn.addEventListener('click', registerShake);
+
+        // On phones, a real shake counts too
+        let lastShake = 0;
+        window.addEventListener('devicemotion', function (e) {
+            const a = e.accelerationIncludingGravity;
+            if (!a) return;
+            const force = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0);
+            const now = Date.now();
+            if (force > 35 && now - lastShake > 250) {
+                lastShake = now;
+                registerShake();
+            }
+        });
+
+        againBtn.addEventListener('click', function () { setMode(mode); });
+
+        // Fajrly is iPhone-only for now: Android visitors get a message instead of a dead link
+        const notice = document.getElementById('notice');
+        document.querySelectorAll('.download-link').forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                if (/android/i.test(navigator.userAgent || '')) {
+                    e.preventDefault();
+                    notice.textContent = 'Fajrly is currently available on iPhone only. Android is coming soon.';
+                    notice.style.display = 'block';
+                    notice.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            });
         });
     </script>
 </body>
