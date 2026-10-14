@@ -69,6 +69,14 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
         
+        .notice {
+            display: none;
+            margin-top: 20px;
+            color: #764ba2;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
         .features {
             margin-top: 40px;
             text-align: left;
@@ -88,13 +96,6 @@
             color: #667eea;
             font-weight: bold;
             font-size: 20px;
-        }
-        
-        .loading {
-            display: none;
-            margin-top: 20px;
-            color: #667eea;
-            font-size: 14px;
         }
         
         @media (max-width: 600px) {
@@ -120,8 +121,8 @@
             Wake up for Fajr prayer with purpose. Our alarm requires you to solve math problems to turn it off - no more hitting snooze half-asleep.
         </p>
         
-        <a href="#" id="downloadBtn" class="download-btn">Download Now</a>
-        <p class="loading" id="loading">Redirecting to app store...</p>
+        <a href="https://apps.apple.com/us/app/fajrly-fajr-alarm/id6751566416" id="downloadBtn" class="download-btn">Download Now</a>
+        <p class="notice" id="notice"></p>
         
         <div class="features">
             <div class="feature">Math problems prevent snoozing</div>
@@ -132,48 +133,30 @@
     </div>
 
     <script>
-        // Replace these with your actual app store URLs
-        const APP_STORE_URL = 'https://apps.apple.com/app/YOUR_APP_ID'; // Replace with your iOS app link
-        const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=YOUR_PACKAGE_NAME'; // Replace with your Android app link
+        const APP_STORE_URL = 'https://apps.apple.com/us/app/fajrly-fajr-alarm/id6751566416';
         
-        function detectDevice() {
+        function isAndroid() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            
-            // iOS detection
-            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                return 'ios';
-            }
-            
-            // Android detection
-            if (/android/i.test(userAgent)) {
-                return 'android';
-            }
-            
-            // Default to iOS for desktop users
-            return 'ios';
+            return /android/i.test(userAgent);
         }
         
-        function redirectToStore() {
-            const device = detectDevice();
-            const url = device === 'ios' ? APP_STORE_URL : PLAY_STORE_URL;
-            
-            // Show loading message
-            document.getElementById('loading').style.display = 'block';
-            
-            // Redirect after a short delay
-            setTimeout(() => {
-                window.location.href = url;
-            }, 500);
-        }
-        
-        // Add click event to download button
         document.getElementById('downloadBtn').addEventListener('click', function(e) {
             e.preventDefault();
-            redirectToStore();
+            const notice = document.getElementById('notice');
+            
+            // Fajrly is iOS-only for now, so don't send Android users to a dead link
+            if (isAndroid()) {
+                notice.textContent = 'Fajrly is currently available on iPhone only. Android is coming soon!';
+                notice.style.display = 'block';
+                return;
+            }
+            
+            notice.textContent = 'Redirecting to the App Store...';
+            notice.style.display = 'block';
+            setTimeout(() => {
+                window.location.href = APP_STORE_URL;
+            }, 500);
         });
-        
-        // Optional: Auto-redirect on page load (uncomment the line below if you want instant redirect)
-        // setTimeout(redirectToStore, 1000);
     </script>
 </body>
 </html>
