@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Fajrly - Wake Up for Fajr</title>
     <meta name="description" content="Fajrly is a Fajr alarm that won't turn off until you finish a challenge, like solving a math problem or shaking your phone, so you're awake enough to pray.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,13 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        img, svg { max-width: 100%; }
 
         body {
             font-family: var(--body);
@@ -75,7 +81,8 @@
             position: relative;
             max-width: 1080px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding-left: max(24px, env(safe-area-inset-left));
+            padding-right: max(24px, env(safe-area-inset-right));
         }
 
         header.site {
@@ -146,6 +153,32 @@
             margin-top: 16px;
             font-size: 15px;
             color: var(--glow);
+        }
+
+        .inapp {
+            display: none;
+            padding: 12px max(20px, env(safe-area-inset-right)) 12px max(20px, env(safe-area-inset-left));
+            padding-top: max(12px, env(safe-area-inset-top));
+            background: var(--glow);
+            color: var(--ink);
+            text-align: center;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .inapp p { font-weight: 600; }
+
+        .inapp button {
+            margin-top: 8px;
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 0;
+            background: var(--ink);
+            color: var(--text-on-dark);
+            cursor: pointer;
         }
 
         /* ---------- Demo alarm ---------- */
@@ -428,15 +461,60 @@
             padding: 24px 0 32px;
         }
 
+        /* Touch-friendly tap targets */
+        .tab, .shake-btn, .problem button, .again, .inapp button { min-height: 44px; }
+
+        /* Large monitors */
+        @media (min-width: 1600px) {
+            .wrap { max-width: 1320px; }
+            h1 { font-size: 80px; }
+            .lede { font-size: 21px; }
+            .alarm { max-width: 420px; }
+            h2 { font-size: 52px; }
+        }
+
+        /* Laptops and tablets in landscape */
+        @media (max-width: 1024px) {
+            .hero { gap: 40px; }
+            .steps { gap: 28px; }
+        }
+
+        /* Tablets in portrait and below: single column */
         @media (max-width: 860px) {
             .hero { grid-template-columns: 1fr; gap: 48px; padding: 48px 0 96px; }
+            h1 { font-size: clamp(40px, 9vw, 64px); max-width: 14ch; }
             .steps, .why { grid-template-columns: 1fr; gap: 32px; }
+            .why { margin-top: 56px; padding-top: 40px; }
+            .why p { font-size: 18px; }
             .light, .closing { padding: 72px 0; }
         }
 
-        @media (max-width: 420px) {
-            .alarm-time { font-size: 68px; }
-            .problem-q { font-size: 34px; }
+        /* Phones */
+        @media (max-width: 600px) {
+            .wrap { padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+            .lede { font-size: 17px; }
+            .cta-row { flex-direction: column; align-items: stretch; text-align: center; }
+            .btn { display: block; width: 100%; text-align: center; padding: 16px 20px; }
+            .closing .wrap { flex-direction: column; align-items: stretch; }
+            .alarm { padding: 24px 20px 22px; border-radius: 28px; }
+            .alarm-time { font-size: 72px; }
+            .problem-q { font-size: 36px; }
+        }
+
+        /* Small phones */
+        @media (max-width: 380px) {
+            .alarm-time { font-size: 60px; }
+            .problem-q { font-size: 30px; }
+            .problem form { flex-direction: column; }
+            .problem button { width: 100%; }
+            .tab { padding: 8px 12px; font-size: 14px; }
+            .wordmark { font-size: 22px; }
+        }
+
+        /* Short landscape screens (phones turned sideways) */
+        @media (max-height: 520px) and (orientation: landscape) {
+            .hero { padding: 32px 0 64px; gap: 32px; }
+            h1 { font-size: clamp(32px, 5vw, 48px); }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -447,6 +525,11 @@
     </style>
 </head>
 <body>
+    <div class="inapp" id="inapp" role="note">
+        <p>You're on <span id="appName">this app</span>? Tap the <strong>⋯</strong> in the top corner, then choose <strong>Open in browser</strong>.</p>
+        <button type="button" id="copyLink">Or copy the App Store link</button>
+    </div>
+
     <div class="sky">
         <div class="wrap">
             <header class="site">
@@ -640,6 +723,27 @@
         });
 
         againBtn.addEventListener('click', function () { setMode(mode); });
+
+        // In-app browsers (TikTok, Instagram, Facebook) often block the App Store handoff: show a hint
+        const APP_STORE_LINK = 'https://apps.apple.com/us/app/fajrly-fajr-alarm/id6751566416';
+        const inAppHint = document.getElementById('inapp');
+        const copyBtn = document.getElementById('copyLink');
+        const ua = navigator.userAgent || '';
+        if (/musical_ly|TikTok|Bytedance|Instagram|FBAN|FBAV/i.test(ua)) {
+            const name = /Instagram/i.test(ua) ? 'Instagram' : /FBAN|FBAV/i.test(ua) ? 'Facebook' : 'TikTok';
+            document.getElementById('appName').textContent = name;
+            inAppHint.style.display = 'block';
+        }
+        copyBtn.addEventListener('click', function () {
+            function done() { copyBtn.textContent = 'Copied. Paste it into Safari.'; }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(APP_STORE_LINK).then(done, function () {
+                    window.prompt('Copy this link:', APP_STORE_LINK);
+                });
+            } else {
+                window.prompt('Copy this link:', APP_STORE_LINK);
+            }
+        });
 
         // Fajrly is iPhone-only for now: Android visitors get a message instead of a dead link
         const notice = document.getElementById('notice');
