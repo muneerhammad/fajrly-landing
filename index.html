@@ -181,6 +181,45 @@
             cursor: pointer;
         }
 
+        .inapp.has-pointer {
+            padding-right: 120px;
+            text-align: left;
+        }
+
+        .pointer {
+            display: none;
+            position: fixed;
+            top: max(22px, calc(env(safe-area-inset-top) + 14px));
+            right: max(12px, env(safe-area-inset-right));
+            z-index: 1000;
+            padding: 10px 16px;
+            border-radius: 14px;
+            border: 2px solid var(--glow);
+            background: var(--night);
+            color: var(--glow);
+            font-family: var(--display);
+            font-weight: 800;
+            font-size: 17px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            animation: bob 1.1s ease-in-out infinite;
+        }
+
+        .pointer::before {
+            content: "";
+            position: absolute;
+            top: -11px;
+            right: 18px;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 11px solid var(--glow);
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
         /* ---------- Demo alarm ---------- */
         .alarm {
             background: rgba(11, 16, 38, 0.72);
@@ -519,7 +558,7 @@
 
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
-            .bell, .alarm.shake .problem input { animation: none; }
+            .bell, .alarm.shake .problem input, .pointer { animation: none; }
             .btn { transition: none; }
         }
     </style>
@@ -529,6 +568,7 @@
         <p>You're on <span id="appName">this app</span>? Tap the <strong>⋯</strong> in the top corner, then choose <strong>Open in browser</strong>.</p>
         <button type="button" id="copyLink">Or copy the App Store link</button>
     </div>
+    <button type="button" class="pointer" id="pointer" aria-label="Dismiss hint">Tap ⋯</button>
 
     <div class="sky">
         <div class="wrap">
@@ -733,6 +773,17 @@
             const name = /Instagram/i.test(ua) ? 'Instagram' : /FBAN|FBAV/i.test(ua) ? 'Facebook' : 'TikTok';
             document.getElementById('appName').textContent = name;
             inAppHint.style.display = 'block';
+
+            // Bouncing arrow in the top-right corner, pointing at the browser's ⋯ menu
+            const pointer = document.getElementById('pointer');
+            pointer.style.display = 'block';
+            inAppHint.classList.add('has-pointer');
+            function hidePointer() {
+                pointer.style.display = 'none';
+                inAppHint.classList.remove('has-pointer');
+            }
+            pointer.addEventListener('click', hidePointer);
+            setTimeout(hidePointer, 20000);
         }
         copyBtn.addEventListener('click', function () {
             function done() { copyBtn.textContent = 'Copied. Paste it into Safari.'; }
