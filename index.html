@@ -565,7 +565,7 @@
 </head>
 <body>
     <div class="inapp" id="inapp" role="note">
-        <p>You're on <span id="appName">this app</span>? Tap the <strong>⋯</strong> in the top corner, then choose <strong>Open in browser</strong>.</p>
+        <p>You're on TikTok? Tap the <strong>⋯</strong> in the top corner, then choose <strong>Open in browser</strong>.</p>
         <button type="button" id="copyLink">Or copy the App Store link</button>
     </div>
     <button type="button" class="pointer" id="pointer" aria-label="Dismiss hint">Tap ⋯</button>
@@ -764,14 +764,12 @@
 
         againBtn.addEventListener('click', function () { setMode(mode); });
 
-        // In-app browsers (TikTok, Instagram, Facebook) often block the App Store handoff: show a hint
+        // TikTok's in-app browser often blocks the App Store handoff: show a hint (TikTok only)
         const APP_STORE_LINK = 'https://apps.apple.com/us/app/fajrly-fajr-alarm/id6751566416';
         const inAppHint = document.getElementById('inapp');
         const copyBtn = document.getElementById('copyLink');
         const ua = navigator.userAgent || '';
-        if (/musical_ly|TikTok|Bytedance|Instagram|FBAN|FBAV/i.test(ua)) {
-            const name = /Instagram/i.test(ua) ? 'Instagram' : /FBAN|FBAV/i.test(ua) ? 'Facebook' : 'TikTok';
-            document.getElementById('appName').textContent = name;
+        if (/musical_ly|TikTok|Bytedance/i.test(ua)) {
             inAppHint.style.display = 'block';
 
             // Bouncing arrow in the top-right corner, pointing at the browser's ⋯ menu
